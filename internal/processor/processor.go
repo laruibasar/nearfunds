@@ -3,6 +3,7 @@ package processor
 
 import (
 	"errors"
+	"time"
 
 	"github.com/laruibasar/nearfunds/internal/models"
 )
@@ -19,6 +20,6 @@ func New() *processor {
 	return &processor{}
 }
 
-func (p *processor) CreateOrder(order models.Order) error {
+func (p *processor) CreateOrder(order models.Order, time time.Time) error {
 	return errors.New("not implemented")
 }
