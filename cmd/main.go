@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/laruibasar/nearfunds/internal/database"
 	"github.com/laruibasar/nearfunds/internal/handler"
 	"github.com/laruibasar/nearfunds/internal/processor"
 )
@@ -12,8 +13,19 @@ import (
 func main() {
 	fmt.Println("starting...")
 
+	// Database setup.
+	dbConfig, err := database.NewConfig()
+	if err != nil {
+		log.Fatalf("failed to config database: %v", err)
+	}
+	db, err := database.New(dbConfig)
+	if err != nil {
+		log.Fatalf("failed to connect database: %v", err)
+	}
+	defer db.Close()
+
 	// Setup processor.
-	proc := processor.New()
+	proc := processor.New(db)
 
 	handle := handler.New(proc)
 

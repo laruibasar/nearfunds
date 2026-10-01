@@ -21,7 +21,7 @@ type database struct {
 	db *gorm.DB
 }
 
-func New(cfg DBConfig) (Database, error) {
+func New(cfg *DBConfig) (Database, error) {
 	db, err := gorm.Open(sqlite.Open(cfg.DSN()), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Warn),
 	})
