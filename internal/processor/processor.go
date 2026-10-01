@@ -23,6 +23,31 @@ func New(db database.Database) *processor {
 	}
 }
 
+// CreateOrder will have the logic to handle a new order.
 func (p *processor) CreateOrder(order models.Order, clock time.Time) error {
-	return errors.New("not implemented")
+	// 1. Check if the order exists.
+	exist, err := p.db.FindOrderByCorrelation(order.Correlation)
+	if err != nil {
+		if err.Error() != "not found" {
+			return err
+		}
+	}
+
+	// 2. Order exists we validate request correlation and data.
+	if exist != nil {
+		return p.handleExistingOrder(order, *exist)
+	}
+
+	// 3. Order does not not exist, try to create.
+	return p.createOrder(order, time.Now())
+}
+
+func (p *processor) handleExistingOrder(new, old models.Order) error {
+	// Implement the validation logic.
+	return errors.New("not implement")
+}
+
+func (p *processor) createOrder(order models.Order, clock time.Time) error {
+	// Implement validation and store, including audit log.
+	return errors.New("not implemented.")
 }

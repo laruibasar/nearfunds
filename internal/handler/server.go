@@ -2,11 +2,18 @@
 package handler
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
+	"github.com/google/uuid"
+	"github.com/laruibasar/nearfunds/internal/models"
 	"github.com/laruibasar/nearfunds/internal/processor"
 )
+
+const headerCorrelation = "Idempotency-Key"
 
 // push dependencies here, like the database.
 type server struct {
@@ -34,6 +41,33 @@ func (s *server) APIRoutes() http.Handler {
 }
 
 func (s *server) handleOrders(w http.ResponseWriter, r *http.Request) {
+	correlationId := r.Header.Get(headerCorrelation)
+	if correlationId != "" {
+		// This is mandatory, throw an 412, the header is mandatory.
+		http.Error(w, errors.New("missing identifier"), http.StatusPreconditionFailed)
+
+		return
+	}
+
+	// Extract body from request and convert into data model from app.
+	var order models.Order
+	jsonDecoded := json.NewDecoder(r.Body)
+	if err := jsonDecoded.Decode(&order); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	correlationUUID := uuid.MustParse(correlationId)
+	order.Correlation = correlationUUID
+
+	err := s.processor.CreateOrder(order, time.Now())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
 	fmt.Println("order created ...to implement")
 }
