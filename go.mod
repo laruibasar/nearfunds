@@ -1,4 +1,4 @@
-module git.sr.ht/~laruibasar/nearfunds
+module github.com/laruibasar/nearfunds
 
 go 1.26
 

@@ -4,7 +4,7 @@ package processor
 import (
 	"errors"
 
-	"git.sr.ht/~laruibasar/nearfunds/internal/models"
+	"github.com/laruibasar/nearfunds/internal/models"
 )
 
 type Processor interface {

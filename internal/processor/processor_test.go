@@ -5,8 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-
-	"git.sr.ht/~laruibasar/nearfunds/internal/models"
+	"github.com/laruibasar/nearfunds/internal/models"
 )
 
 func TestCreateOrder(t *testing.T) {

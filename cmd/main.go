@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"git.sr.ht/~laruibasar/nearfunds/internal/handler"
-	"git.sr.ht/~laruibasar/nearfunds/internal/processor"
+	"github.com/laruibasar/nearfunds/internal/handler"
+	"github.com/laruibasar/nearfunds/internal/processor"
 )
 
 func main() {
