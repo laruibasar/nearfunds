@@ -6,12 +6,16 @@ import (
 	"net/http"
 
 	"git.sr.ht/~laruibasar/nearfunds/internal/handler"
+	"git.sr.ht/~laruibasar/nearfunds/internal/processor"
 )
 
 func main() {
 	fmt.Println("starting...")
 
-	handle := handler.New()
+	// Setup processor.
+	proc := processor.New()
+
+	handle := handler.New(proc)
 
 	fmt.Println("...started")
 

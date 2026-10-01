@@ -4,13 +4,17 @@ package handler
 import (
 	"fmt"
 	"net/http"
+
+	"git.sr.ht/~laruibasar/internal/processor"
 )
 
 // push dependencies here, like the database.
-type server struct{}
+type server struct {
+	processor processor.Processor
+}
 
-func New() *server {
-	return &server{}
+func New(p processor.Processor) *server {
+	return &server{processor: p}
 }
 
 func (s *server) ApiRoutes() http.Handler {
