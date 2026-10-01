@@ -3,6 +3,7 @@ package database
 
 import (
 	"context"
+	"errors"
 
 	"github.com/google/uuid"
 	"github.com/laruibasar/nearfunds/internal/models"
@@ -12,7 +13,8 @@ import (
 )
 
 type Database interface {
-	CreateOrder(order models.Order) (uuid.UUID, error)
+	FindOrderByCorrelation(id uuid.UUID) (*models.Order, error)
+	CreateOrder(order models.Order) (*uint, error)
 	Ping(ctx context.Context) error
 	Close() error
 }
@@ -52,6 +54,46 @@ func (d *database) Close() error {
 	return db.Close()
 }
 
-func (d *database) CreateOrder(order models.Order) (uuid.UUID, error) {
-	return uuid.New(), nil
+// CreateOrder handles the store of the order into database.
+// Uses a transaction.
+func (d *database) CreateOrder(order models.Order) (*uint, error) {
+	tx := d.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	dbOrder := &Order{
+		Account: order.Account,
+	}
+
+	if err := tx.Create(&dbOrder).Error; err != nil {
+		tx.Rollback()
+
+		return nil, err
+	}
+
+	return &dbOrder.ID, tx.Commit().Error
+}
+
+// FindOrderByCorrelation allows to search the database for the correlation id that is associated with the order.
+func (d *database) FindOrderByCorrelation(id uuid.UUID) (*models.Order, error) {
+	var dbOrder Order
+	find := d.db.First(&dbOrder, "correlation_id = ?", id)
+
+	if find.Error != nil {
+		if errors.Is(find.Error, gorm.ErrRecordNotFound) {
+			return nil, errors.New("not found")
+		}
+		return nil, find.Error
+	}
+
+	return &models.Order{
+		Account: dbOrder.Account,
+	}, nil
 }
