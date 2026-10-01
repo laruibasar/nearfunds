@@ -1,0 +1,41 @@
+CREATE TABLE funds (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  currency CHAR(3),
+  cutoff TIMESTAMP);
+
+CREATE TABLE accounts (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  cash INTEGER NOT NULL DEFAULT 0,
+  positions INTEGER NOT NULL DEFAULT 0);
+
+CREATE TABE navs (
+  id INTEGER PRIMARY KEY,
+  fund_id INTEGER NOT NULL,
+  value INTEGER NOT NULL DEFAULT 0,
+  date TIMESTAMP NOT NULL,
+  FOREIGN KEY (fund_id) REFERENCES funds (id),
+)
+
+CREATE TABLE orders (
+  id INTEGER PRIMARY KEY,
+  request_id TEXT NOT NULL,
+  account_id INTEGER NOT NULL,
+  fund_id INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'RECEIVED',
+  cash INTEGER NOT NULL DEFAULT 0,
+  units INTEGER NOT NULL DEFAULT 0,
+  type TEXT NOT NULL DEFAULT '',
+  placed_at TIMESTAMP NOT NULL,
+  trade_date_id INTEGER,
+  FOREIGN KEY (account_id) REFERENCES accounts (id),
+  FOREIGN KEY (fund_id) REFERENCES funds (id),
+)
+
+CREATE TABLE audits (
+  id INTEGER PRIMARY KEY,
+  order_id INTEGER NOT NULL,
+  change TEXT,
+  created_at TIMESTAMP
+)
