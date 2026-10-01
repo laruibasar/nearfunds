@@ -20,7 +20,7 @@ func main() {
 	fmt.Println("...started")
 
 	// TODO: fix the server setup for later, just to put it up.
-	if err := http.ListenAndServe(":8080", handle.ApiRoutes()); err != nil {
+	if err := http.ListenAndServe(":8080", handle.APIRoutes()); err != nil {
 		log.Fatalf("failed to run server: %v", err)
 	}
 }

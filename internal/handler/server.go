@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/laruibasar/internal/processor"
+	"github.com/laruibasar/nearfunds/internal/processor"
 )
 
 // push dependencies here, like the database.
@@ -17,7 +17,7 @@ func New(p processor.Processor) *server {
 	return &server{processor: p}
 }
 
-func (s *server) ApiRoutes() http.Handler {
+func (s *server) APIRoutes() http.Handler {
 	srv := http.NewServeMux()
 
 	srv.HandleFunc("POST /orders", s.handleOrders)
