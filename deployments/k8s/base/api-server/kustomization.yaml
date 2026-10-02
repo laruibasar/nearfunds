@@ -1,0 +1,13 @@
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - api-server/resources/deployment.yaml
+  - api-server/resources/service.yaml
+
+
+configMapGenerator:
+  - name: api-server-config
+    env:
+      - APP_LOG_LEVEL=info

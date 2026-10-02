@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Add more services if we would want to have a api-server and a fund-processor services.
+resources:
+  - api-server/kustomization.yaml
+

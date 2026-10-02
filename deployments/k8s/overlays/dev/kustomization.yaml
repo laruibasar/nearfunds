@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kink: Kustomization
+
+namespace: nearfunds
+
+resources:
+ - ../../base
+ - api-server/kustomization.yaml
+
+
+configMapGenerator:
+  - name: api-server-config
+    behavior: merge
+    envs:
+      - DB_HOST = somewhere-dev

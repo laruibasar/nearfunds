@@ -1,0 +1,79 @@
+# I'm using nvim with LazyVim plugins, I have no idea how I set up this to spit this, but it is something similar
+# to what I used to use.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # This api-server would need to match the image we publish somewhere.
+  name: api-server
+  namespace: default
+  labels:
+    app: api-server
+spec:
+  selector:
+    matchLabels:
+      app: api-server
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container:  api-server
+      labels:
+        app: api-server
+    spec:
+      # initContainers:
+        # Init containers are exactly like regular containers, except:
+          # - Init containers always run to completion.
+          # - Each init container must complete successfully before the next one starts.
+      containers:
+      - name: api-server
+        image: api-server:latest
+        imagePullPolicy: 
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 5
+          timeoutSeconds: 2
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: api-server
+              key: DB_HOST
+        # I usually place credentials here that need to be unseal and use a configMap in other files.
+        ports:
+        - containerPort: 80
+          name: api-server
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Taipei
+      restartPolicy: Always
+---
+
