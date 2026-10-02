@@ -41,10 +41,12 @@ func (s *server) APIRoutes() http.Handler {
 }
 
 func (s *server) handleOrders(w http.ResponseWriter, r *http.Request) {
-	correlationId := r.Header.Get(headerCorrelation)
-	if correlationId != "" {
-		// This is mandatory, throw an 412, the header is mandatory.
-		http.Error(w, errors.New("missing identifier"), http.StatusPreconditionFailed)
+	correlationID := r.Header.Get(headerCorrelation)
+	if correlationID != "" {
+		// This is mandatory, throw an 412, the header is missing and needed.
+		err := errors.New("missing order identifier")
+
+		http.Error(w, err.Error(), http.StatusPreconditionFailed)
 
 		return
 	}
@@ -58,7 +60,7 @@ func (s *server) handleOrders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	correlationUUID := uuid.MustParse(correlationId)
+	correlationUUID := uuid.MustParse(correlationID)
 	order.Correlation = correlationUUID
 
 	err := s.processor.CreateOrder(order, time.Now())
