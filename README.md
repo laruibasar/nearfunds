@@ -117,4 +117,32 @@ For deploument k8s configuration will be following this rule.
   Looking into gitlab ci I never used, but looking at the syntax, it looks kind of similar to in a way to implement this kind of stage by stage. Note: secrets and some linting should be done locally, preferable on 
   on a git hook (example `ggshield` to look for secrets and run `golangci-lint` there is better than find a commit there, failures made me choose this).
 
-:q
+## How to run
+
+Using Makefile would allow to run this by simply do `make run-app` or using a `DB_HOST make run-app` to set the app running, however it does not do much stuff.
+
+It deploy the http server and allow to do some output prints.
+
+Do small test by having after run the make run-app in another terminal: `go run tools/servertest/main.go`
+
+## Final remarks
+
+On the delivery section there as some information about the app, I have already try to answer it but will give a bit more:
+
+### Represent cash and unit
+
+I was made aware about that requirement here and did some check. I would probably choose to represent internally in the app as `uint64` to avoid using `float64` do to the way the number is represented and the missing representation could cause. This would be consistent in the go logic in the database.
+
+Probably represent this in a company library to represent the numbers and decimal points correctly and be consistent in all features of the app. I'm did not found some kind of official or semi-official library to use to use in enterprise environment.
+
+I remembered after, about reading something in The Pragmatic Programmer I have somewhere that. This is a real issue this to consider in financial transactions. It is a git effort to maintain if this is choosen but would be on the look out for something standard to show up by someone.
+
+### Preven overselling and double processing, with one or many replicas
+
+Like a mentioned, I would probably have a split service: one handling HTTP requests and queue the orders and operations in a FIFO message system and another processing the orders.
+
+I would do the id validation in one place and also on the other, even if it means code duplication, but would be better.
+
+Next the messages should be allowed to, on failure to process, to be retried after 5 or 10 minutes. Allowing to progress the queue and try to handle case by case, even if some order may cause the cash amount to drop and then later fail a previous order.
+
+This would make the system asynchronous and need to be managed with the users, to not have them assume something failed to happen.
